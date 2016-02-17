@@ -67,3 +67,4 @@ INSERT INTO belongs_to VALUES(5, 5);
 INSERT INTO release VALUES(5, 5, '2009-01-17');
 INSERT INTO has_signed VALUES(5, 5);
 INSERT INTO contains VALUES(5, 5);
+
