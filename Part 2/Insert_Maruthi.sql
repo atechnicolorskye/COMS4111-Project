@@ -1,8 +1,8 @@
-INSERT INTO Artists VALUES(06, 'Bananas', '1993-06-06', 'USA');
-INSERT INTO Artists VALUES(07, 'Jackson', '1999-04-21', 'England');
-INSERT INTO Artists VALUES(08, 'Rahman', '1996-01-05', 'India');
-INSERT INTO Artists VALUES(09, 'Apples', '2015-09-09', 'China');
-INSERT INTO Artists VALUES(10, 'Eminem', '1998-08-08', 'USA');
+INSERT INTO Artist VALUES(06, 'Bananas', '1993-06-06', 'USA');
+INSERT INTO Artist VALUES(07, 'Jackson', '1999-04-21', 'England');
+INSERT INTO Artist VALUES(08, 'Rahman', '1996-01-05', 'India');
+INSERT INTO Artist VALUES(09, 'Apples', '2015-09-09', 'China');
+INSERT INTO Artist VALUES(10, 'Eminem', '1998-08-08', 'USA');
 
 INSERT INTO Album VALUES(06, 'Hits', '58:06', 8);
 INSERT INTO Album VALUES(07, 'Welcome', '34:55', 5);
