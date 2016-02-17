@@ -38,7 +38,7 @@ PRIMARY KEY(l_id)
 CREATE TABLE Playlist(
 p_id int8,
 p_name varchar(64),
-p_time timestamp,
+p_time timestamptz,
 p_num_songs int8,
 p_dur interval,
 p_user varchar(64),
@@ -48,7 +48,7 @@ PRIMARY KEY(p_id)
 CREATE TABLE Concert(
 c_id int8,
 c_name varchar(64),
-c_timestamp timestampz,
+c_timestamp timestamptz,
 c_loc varchar(64),
 PRIMARY KEY(c_id)
 );
@@ -56,7 +56,7 @@ PRIMARY KEY(c_id)
 CREATE TABLE performs_at(
 a_id int8,
 c_id int8,
-c_timestamp timestampz,
+c_timestamp timestamptz,
 c_loc varchar(64),
 PRIMARY KEY(a_id, c_id),
 FOREIGN KEY(a_id) REFERENCES Artist,
