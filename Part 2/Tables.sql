@@ -56,11 +56,9 @@ PRIMARY KEY(c_id)
 CREATE TABLE performs_at(
 a_id int8,
 c_id int8,
-c_timestamp timestamptz,
-c_loc varchar(64),
 PRIMARY KEY(a_id, c_id),
 FOREIGN KEY(a_id) REFERENCES Artist,
-FOREIGN KEY(c_id, c_timestamp, c_loc) REFERENCES Concert(c_id, c_timestamp, c_loc)
+FOREIGN KEY(c_id) REFERENCES Concert
 );
 
 CREATE TABLE contributes_to(
