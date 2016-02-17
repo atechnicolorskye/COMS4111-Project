@@ -60,7 +60,7 @@ c_timestamp timestamptz,
 c_loc varchar(64),
 PRIMARY KEY(a_id, c_id),
 FOREIGN KEY(a_id) REFERENCES Artist,
-FOREIGN KEY(c_id, c_timestamp, c_loc) REFERENCES Concert
+FOREIGN KEY(c_id, c_timestamp, c_loc) REFERENCES Concert(c_id, c_timestamp, c_loc)
 );
 
 CREATE TABLE contributes_to(
@@ -94,14 +94,14 @@ CREATE TABLE has_signed(
 l_id int8 NOT NULL,
 a_id int8,
 PRIMARY KEY(a_id),
-FOREIGN KEY(l_id) REFERENCES Labels
+FOREIGN KEY(l_id) REFERENCES Label
 );
 
 CREATE TABLE contains(
 p_id int8,
 s_id int8,
 PRIMARY KEY(p_id, s_id),
-FOREIGN KEY(p_id) REFERENCES Playlists,
-FOREIGN KEY(s_id) REFERENCES Songs
+FOREIGN KEY(p_id) REFERENCES Playlist,
+FOREIGN KEY(s_id) REFERENCES Song
 );
 
