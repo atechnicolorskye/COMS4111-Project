@@ -50,7 +50,8 @@ c_id int8,
 c_name varchar(64),
 c_timestamp timestamptz,
 c_loc varchar(64),
-PRIMARY KEY(c_id)
+PRIMARY KEY(c_id),
+UNIQUE(c_name, c_timestamp)
 );
 
 CREATE TABLE performs_at(
@@ -60,6 +61,18 @@ PRIMARY KEY(a_id, c_id),
 FOREIGN KEY(a_id) REFERENCES Artist,
 FOREIGN KEY(c_id) REFERENCES Concert
 );
+
+-- CREATE TABLE performs_at(
+-- a_id int8,
+-- c_id int8,
+-- c_name varchar(64),
+-- c_timestamp timestamptz,
+-- c_loc varchar(64),
+-- PRIMARY KEY(a_id, c_id),
+-- FOREIGN KEY(a_id) REFERENCES Artist,
+-- FOREIGN KEY(c_id) REFERENCES Concert(c_id),
+-- FOREIGN KEY(c_name, c_timestamp, c_loc) REFERENCES Concert(c_name, c_timestamp, c_loc)
+-- );
 
 CREATE TABLE contributes_to(
 a_id int8 NOT NULL,

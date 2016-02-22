@@ -40,11 +40,11 @@ INSERT INTO Concert VALUES(08,'Tour 8', '2013-06-27 15:48:53.556804+00', 'Chicag
 INSERT INTO Concert VALUES(09,'Tour 9', '2014-05-19 18:00:00.556804+00', 'Dallas');
 INSERT INTO Concert VALUES(10,'Tour 10', '2015-02-04 21:30:00.556804+00', 'Atlanta');
 
-INSERT INTO performs_at VALUES(06, 06, '2015-02-17 09:38:53.556804+00', 'Atlanta');
-INSERT INTO performs_at VALUES(07, 08, '2014-01-07 09:38:53.556804+00', 'New York');
-INSERT INTO performs_at VALUES(08, 09, '2013-06-27 15:48:53.556804+00', 'Chicago');
-INSERT INTO performs_at VALUES(09, 10, '2014-05-19 18:00:00.556804+00', 'Dallas');
-INSERT INTO performs_at VALUES(10, 07, '2015-02-04 21:30:00.556804+00', 'Atlanta');
+INSERT INTO performs_at VALUES(06, 06);
+INSERT INTO performs_at VALUES(07, 08);
+INSERT INTO performs_at VALUES(08, 09);
+INSERT INTO performs_at VALUES(09, 10);
+INSERT INTO performs_at VALUES(10, 07);
 
 INSERT INTO contributes_to VALUES(06, 06, 06);
 INSERT INTO contributes_to VALUES(07, 08, 09);
