@@ -9,7 +9,7 @@ where a.a_id in (select c.a_id
                  having count(c.a_id) >= 2);
 
 
--- Find artist names of artists who have contributed exactly 10 songs to an album
+-- Find names of artists who have contributed exactly 10 songs to an album
 -- Get Rahman, Green Day, Andrew Bird
 
 select a_name
