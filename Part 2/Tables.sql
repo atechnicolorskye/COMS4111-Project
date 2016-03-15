@@ -74,16 +74,6 @@ FOREIGN KEY(c_id) REFERENCES Concert
 -- FOREIGN KEY(c_name, c_timestamp, c_loc) REFERENCES Concert(c_name, c_timestamp, c_loc)
 -- );
 
-CREATE TABLE contributes_to(
-a_id int8 NOT NULL,
-s_id int8,
-al_id int8,
-PRIMARY KEY(s_id),
-FOREIGN KEY(a_id) REFERENCES Artist,
-FOREIGN KEY(s_id) REFERENCES Song,
-FOREIGN KEY(al_id) REFERENCES Album
-);
-
 CREATE TABLE belongs_to(
 s_id int8,
 g_id int8 NOT NULL,
@@ -116,3 +106,12 @@ FOREIGN KEY(p_id) REFERENCES Playlist,
 FOREIGN KEY(s_id) REFERENCES Song
 );
 
+CREATE TABLE contributes_to(
+a_id int8 NOT NULL,
+s_id int8,
+al_id int8,
+PRIMARY KEY(s_id),
+FOREIGN KEY(a_id) REFERENCES Artist,
+FOREIGN KEY(s_id) REFERENCES Song,
+FOREIGN KEY(al_id) REFERENCES Album
+);
