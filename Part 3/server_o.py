@@ -16,6 +16,7 @@ Read about it online.
 """
 
 from flask import Flask, request, render_template, g, redirect, Response
+from flask.views import views
 import os
 import psycopg2
 from sqlalchemy import *
