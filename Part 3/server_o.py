@@ -16,7 +16,7 @@ Read about it online.
 """
 
 from flask import Flask, request, render_template, g, redirect, Response
-from flask.views import views
+from flask.views import View
 import os
 import psycopg2
 from sqlalchemy import *
@@ -99,66 +99,65 @@ def teardown_request(exception):
 #
 @app.route('/')
 def index():
-  """
-  request is a special object that Flask provides to access web request information:
+    """
+    request is a special object that Flask provides to access web request information:
 
-  request.method:   "GET" or "POST"
-  request.form:     if the browser submitted a form, this contains the data in the form
-  request.args:     dictionary of URL arguments e.g., {a:1, b:2} for http://localhost?a=1&b=2
+    request.method:   "GET" or "POST"
+    request.form:     if the browser submitted a form, this contains the data in the form
+    request.args:     dictionary of URL arguments e.g., {a:1, b:2} for http://localhost?a=1&b=2
 
-  See its API: http://flask.pocoo.org/docs/0.10/api/#incoming-request-data
-  """
+    See its API: http://flask.pocoo.org/docs/0.10/api/#incoming-request-data
+    """
 
-  # DEBUG: this is debugging code to see what request looks like
-  print request.args
+    # DEBUG: this is debugging code to see what request looks like
+    print request.args
+
+    #
+    # example of a database query
+    #
+    # cursor = g.conn.execute("SELECT name FROM test")
+    # names = []
+    # for result in cursor:
+    #   names.append(result['name'])  # can also be accessed using result[0]
+    # print names
+    names = engine.table_names()
+    print names
+    # cursor.close()
+
+    #
+    # Flask uses Jinja templates, which is an extension to HTML where you can
+    # pass data to a template and dynamically generate HTML based on the data
+    # (you can think of it as simple PHP)
+    # documentation: https://realpython.com/blog/python/primer-on-jinja-templating/
+    #
+    # You can see an example template in templates/index.html
+    #
+    # context are the variables that are passed to the template.
+    # for example, "data" key in the context variable defined below will be
+    # accessible as a variable in index.html:
+    #
+    #     # will print: [u'grace hopper', u'alan turing', u'ada lovelace']
+    #     <div>{{data}}</div>
+    #
+    #     # creates a <div> tag for each element in data
+    #     # will print:
+    #     #
+    #     #   <div>grace hopper</div>
+    #     #   <div>alan turing</div>
+    #     #   <div>ada lovelace</div>
+    #     #
+    #     {% for n in data %}
+    #     <div>{{n}}</div>
+    #     {% endfor %}
+    #
+    context = dict(data=names)
 
 
-  #
-  # example of a database query
-  #
-  # cursor = g.conn.execute("SELECT name FROM test")
-  # names = []
-  # for result in cursor:
-  #   names.append(result['name'])  # can also be accessed using result[0]
-  # print names
-  names = engine.table_names()
-  print names
-  # cursor.close()
-
-  #
-  # Flask uses Jinja templates, which is an extension to HTML where you can
-  # pass data to a template and dynamically generate HTML based on the data
-  # (you can think of it as simple PHP)
-  # documentation: https://realpython.com/blog/python/primer-on-jinja-templating/
-  #
-  # You can see an example template in templates/index.html
-  #
-  # context are the variables that are passed to the template.
-  # for example, "data" key in the context variable defined below will be
-  # accessible as a variable in index.html:
-  #
-  #     # will print: [u'grace hopper', u'alan turing', u'ada lovelace']
-  #     <div>{{data}}</div>
-  #
-  #     # creates a <div> tag for each element in data
-  #     # will print:
-  #     #
-  #     #   <div>grace hopper</div>
-  #     #   <div>alan turing</div>
-  #     #   <div>ada lovelace</div>
-  #     #
-  #     {% for n in data %}
-  #     <div>{{n}}</div>
-  #     {% endfor %}
-  #
-  context = dict(data = names)
-
-
-  #
-  # render_template looks in the templates/ folder for files.
-  # for example, the below file reads template/index.html
-  #
-  return render_template("index.html", **context)
+    #
+    # render_template looks in the templates/ folder for files.
+    # for example, the below file reads template/index.html
+    #
+    return render_template("index.html", **context)
 
 #
 # This is an example of a different path.  You can see it at
@@ -168,9 +167,48 @@ def index():
 # notice that the functio name is another() rather than index()
 # the functions for each app.route needs to have different names
 #
-@app.route('/another')
-def another():
-  return render_template("anotherfile.html")
+
+# @app.route('/concert')
+# def another():
+#     query = "SELECT * FROM concert;"
+#     cursor = g.conn.execute(query)
+#     output = []
+#     for result in cursor:
+#         output.append(result)
+#     cursor.close()
+#     context = dict(n='Concert', table=output)
+#     return render_template("table.html", **context)
+
+
+# Creates class to render all hyperlinks
+class List_Insert(View):
+
+    methods = ['GET']
+
+    # def dispatch_request(self, name):
+    #     return 'Hello %s!' % name
+
+    def dispatch_request(self, name):
+        # print name
+        query = "SELECT * FROM " + str(name)
+        # print query
+        cursor = g.conn.execute(query)
+        # print cursor
+        output = []
+        for result in cursor:
+            output.append(result)
+        # print output
+        cursor.close()
+        context = dict(t_name=str(name), table=output)
+        return render_template("table.html", **context)
+
+    # def add():
+    #     user_input = request.form['input']
+    #     g.conn.execute('INSERT INTO '+ name + ' VALUES (NULL, ?)', user_input)
+    #     return redirect('/')
+
+app.add_url_rule('/<name>', view_func=List_Insert.as_view('List_Table'))
+
 
 
 # Example of adding new data to the database

@@ -15,13 +15,10 @@ A debugger such as "pdb" may be helpful for debugging.
 Read about it online.
 """
 
-from flask import Flask, request, render_template, g, redirect, Response
-#from flask.views import Views
 import os
-import psycopg2
 from sqlalchemy import *
 from sqlalchemy.pool import NullPool
-from sqlalchemy_utils import database_exists, create_database
+from flask import Flask, request, render_template, g, redirect, Response
 
 tmpl_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'templates')
 app = Flask(__name__, template_folder=tmpl_dir)
@@ -32,7 +29,7 @@ app = Flask(__name__, template_folder=tmpl_dir)
 # However for the project you will need to connect to your Part 2 database in order to use the
 # data
 #
-# XXX: The URI should be in the format of:
+# XXX: The URI should be in the format of: 
 #
 #     postgresql://USER:PASSWORD@w4111db.eastus.cloudapp.azure.com/username
 #
@@ -40,26 +37,46 @@ app = Flask(__name__, template_folder=tmpl_dir)
 #
 #     DATABASEURI = "postgresql://ewu2493:foobar@w4111db.eastus.cloudapp.azure.com/ewu2493"
 #
-DATABASEURI = "postgresql://localhost:5432/Production"
+DATABASEURI = "sqlite:///test.db"
 
 
 #
 # This line creates a database engine that knows how to connect to the URI above
 #
-engine = create_engine(DATABASEURI, isolation_level="AUTOCOMMIT")
-#if not database_exists(engine.url):
-create_database(engine.url)
-engine.execute(open("Tables.sql", "r").read())
-engine.execute(open("Insert_Maruthi.sql", "r").read())
-engine.execute(open("Insert_Sky.sql", "r").read())
-print True
+engine = create_engine(DATABASEURI)
+
+
+#
+# START SQLITE SETUP CODE
+#
+# after these statements run, you should see a file test.db in your webserver/ directory
+# this is a sqlite database that you can query like psql typing in the shell command line:
+# 
+#     sqlite3 test.db
+#
+# The following sqlite3 commands may be useful:
+# 
+#     .tables               -- will list the tables in the database
+#     .schema <tablename>   -- print CREATE TABLE statement for table
+# 
+# The setup code should be deleted once you switch to using the Part 2 postgresql database
+#
+engine.execute("""DROP TABLE IF EXISTS test;""")
+engine.execute("""CREATE TABLE IF NOT EXISTS test (
+  id serial,
+  name text
+);""")
+engine.execute("""INSERT INTO test(name) VALUES ('grace hopper'), ('alan turing'), ('ada lovelace');""")
+#
+# END SQLITE SETUP CODE
+#
 
 
 
 @app.before_request
 def before_request():
   """
-  This function is run at the beginning of every web request
+  This function is run at the beginning of every web request 
   (every time you enter an address in the web browser).
   We use it to setup a database connection that can be used throughout the request
 
@@ -93,7 +110,7 @@ def teardown_request(exception):
 #       @app.route("/foobar/", methods=["POST", "GET"])
 #
 # PROTIP: (the trailing / in the path is important)
-#
+# 
 # see for routing: http://flask.pocoo.org/docs/0.10/quickstart/#routing
 # see for decorators: http://simeonfranklin.com/blog/2012/jul/1/python-decorators-in-12-steps/
 #
@@ -116,14 +133,11 @@ def index():
   #
   # example of a database query
   #
-  # cursor = g.conn.execute("SELECT name FROM test")
-  # names = []
-  # for result in cursor:
-  #   names.append(result['name'])  # can also be accessed using result[0]
-  # print names
-  names = engine.table_names()
-  print names
-  # cursor.close()
+  cursor = g.conn.execute("SELECT name FROM test")
+  names = []
+  for result in cursor:
+    names.append(result['name'])  # can also be accessed using result[0]
+  cursor.close()
 
   #
   # Flask uses Jinja templates, which is an extension to HTML where you can
@@ -134,14 +148,14 @@ def index():
   # You can see an example template in templates/index.html
   #
   # context are the variables that are passed to the template.
-  # for example, "data" key in the context variable defined below will be
+  # for example, "data" key in the context variable defined below will be 
   # accessible as a variable in index.html:
   #
   #     # will print: [u'grace hopper', u'alan turing', u'ada lovelace']
   #     <div>{{data}}</div>
-  #
+  #     
   #     # creates a <div> tag for each element in data
-  #     # will print:
+  #     # will print: 
   #     #
   #     #   <div>grace hopper</div>
   #     #   <div>alan turing</div>
@@ -162,7 +176,7 @@ def index():
 
 #
 # This is an example of a different path.  You can see it at
-#
+# 
 #     localhost:8111/another
 #
 # notice that the functio name is another() rather than index()
@@ -214,3 +228,4 @@ if __name__ == "__main__":
 
 
   run()
+

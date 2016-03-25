@@ -1,0 +1,11 @@
+{% extends "layout.html" %}
+{% block content %}
+
+<h2>{{t_name}}:</h2>
+<div>
+  {% for t in table %}
+  <div>- {{t}}</a></div>
+  {% endfor %}
+</div>
+
+{% endblock %}
