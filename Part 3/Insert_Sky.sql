@@ -8,9 +8,9 @@ INSERT INTO Concert VALUES(1, 'Green Day', '2016-02-17 21:11:41.53332+00', 'Glas
 INSERT INTO performs_at VALUES(1, 1);
 INSERT INTO contributes_to VALUES(1, 1, 1);
 INSERT INTO belongs_to VALUES(1, 1);
-INSERT INTO release VALUES(1, 1, '2016-02-17');
+INSERT INTO release_ VALUES(1, 1, '2016-02-17');
 INSERT INTO has_signed VALUES(1, 1);
-INSERT INTO contains VALUES(1, 1);
+INSERT INTO contains_ VALUES(1, 1);
 
 INSERT INTO Artist VALUES (2, 'Andrew Bird', '08-Jul-2011', 'USA');
 INSERT INTO Album VALUES (2, 'Break It Yourself', '0:40:00', '10' );
@@ -25,9 +25,9 @@ INSERT INTO performs_at VALUES(2, 2);
 INSERT INTO contributes_to VALUES(2, 2, 2);
 INSERT INTO contributes_to VALUES(2, 11, 11);
 INSERT INTO belongs_to VALUES(2, 2);
-INSERT INTO release VALUES(2, 2, '2015-02-17');
+INSERT INTO release_ VALUES(2, 2, '2015-02-17');
 INSERT INTO has_signed VALUES(2, 2);
-INSERT INTO contains VALUES(2, 2);
+INSERT INTO contains_ VALUES(2, 2);
 
 INSERT INTO Artist VALUES (3, 'Arcade Fire', '08-Dec-2001', 'Canada');
 INSERT INTO Album VALUES (3, 'The Suburbs', '1:20:00', '12' );
@@ -41,9 +41,9 @@ INSERT INTO performs_at VALUES(3, 3);
 INSERT INTO performs_at VALUES(3, 11);
 INSERT INTO contributes_to VALUES(3, 3, 3);
 INSERT INTO belongs_to VALUES(3, 3);
-INSERT INTO release VALUES(3, 3, '2014-06-17');
+INSERT INTO release_ VALUES(3, 3, '2014-06-17');
 INSERT INTO has_signed VALUES(3, 3);
-INSERT INTO contains VALUES(3, 3);
+INSERT INTO contains_ VALUES(3, 3);
 
 INSERT INTO Artist VALUES (4, 'Fink', '08-Jan-2007', 'UK');
 INSERT INTO Album VALUES (4, 'Perfect Darkness', '0:50:00', '13' );
@@ -55,9 +55,9 @@ INSERT INTO Concert VALUES(4, 'Fink', '2011-05-17 21:11:41.54442+00', 'Royal Alb
 INSERT INTO performs_at VALUES(4, 4);
 INSERT INTO contributes_to VALUES(4, 4, 4);
 INSERT INTO belongs_to VALUES(4, 4);
-INSERT INTO release VALUES(4, 4, '2011-05-17');
+INSERT INTO release_ VALUES(4, 4, '2011-05-17');
 INSERT INTO has_signed VALUES(4, 4);
-INSERT INTO contains VALUES(4, 4);
+INSERT INTO contains_ VALUES(4, 4);
 
 INSERT INTO Artist VALUES (5, 'Bajofondo', '08-Nov-2005', 'Argentina');
 INSERT INTO Album VALUES (5, 'Presente', '0:55:00', '15' );
@@ -69,7 +69,7 @@ INSERT INTO Concert VALUES(5, 'Bajofondo', '2009-01-17 21:11:51.55552+00', 'Espl
 INSERT INTO performs_at VALUES(5, 5);
 INSERT INTO contributes_to VALUES(5, 5, 5);
 INSERT INTO belongs_to VALUES(5, 5);
-INSERT INTO release VALUES(5, 5, '2009-01-17');
+INSERT INTO release_ VALUES(5, 5, '2009-01-17');
 INSERT INTO has_signed VALUES(5, 5);
-INSERT INTO contains VALUES(5, 5);
+INSERT INTO contains_ VALUES(5, 5);
 

@@ -117,13 +117,13 @@ def index():
   #
   # example of a database query
   #
-  cursor = g.conn.execute("SELECT name FROM test")
+  cursor = g.conn.execute("\dt")
   names = []
   for result in cursor:
     names.append(result['name'])  # can also be accessed using result[0]
   print names
-  names = engine.table_names()
-  print names
+  # names = engine.table_names()
+  # print names
   cursor.close()
 
   #
@@ -159,7 +159,7 @@ def index():
   # render_template looks in the templates/ folder for files.
   # for example, the below file reads template/index.html
   #
-  return render_template("index.html", **context)
+  return render_template("index_2.html", **context)
 
 #
 # This is an example of a different path.  You can see it at
@@ -178,7 +178,8 @@ def another():
 @app.route('/add', methods=['POST'])
 def add():
   name = request.form['name']
-  g.conn.execute('INSERT INTO test VALUES (NULL, ?)', name)
+  print name
+  g.conn.execute('INSERT INTO test VALUES(NULL, ?);', names)
   return redirect('/')
 
 

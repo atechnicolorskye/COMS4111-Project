@@ -82,7 +82,7 @@ FOREIGN KEY(g_id) REFERENCES Genre,
 FOREIGN KEY(s_id) REFERENCES Song
 );
 
-CREATE TABLE release(
+CREATE TABLE release_(
 al_id int8,
 l_id int8,
 r_year date,
@@ -95,10 +95,11 @@ CREATE TABLE has_signed(
 l_id int8 NOT NULL,
 a_id int8,
 PRIMARY KEY(a_id),
+FOREIGN KEY(a_id) REFERENCES Artist,
 FOREIGN KEY(l_id) REFERENCES Label
 );
 
-CREATE TABLE contains(
+CREATE TABLE contains_(
 p_id int8,
 s_id int8,
 PRIMARY KEY(p_id, s_id),

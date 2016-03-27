@@ -2,10 +2,27 @@
 {% block content %}
 
 <h2>{{t_name}}:</h2>
-<div>
-  {% for t in table %}
-  <div>- {{t}}</a></div>
+<table>
+{% for f in fields %}
+<TD>
+{% for x in f %}
+   <b>{{x}}</b>
+{% endfor %}
+</TD>
   {% endfor %}
-</div>
+
+{% for t in table %}
+<TR>
+{% for x in t %}
+   <TD>{{x}}</TD>
+{% endfor %}
+</TR>
+  {% endfor %}
+</table>
+<br>
+
+<form method="POST" action={{t_name ~ "/search"}}>
+<p>Search for {% if t_name == 'artist' or t_name == 'album' %} an {% else %} a {% endif %} {{t_name}}: <input type="text" name="search"> <input type="submit" value="Search"></p>
+</form>
 
 {% endblock %}

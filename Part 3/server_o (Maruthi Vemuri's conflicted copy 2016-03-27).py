@@ -58,30 +58,30 @@ if not database_exists(engine.url):
 
 @app.before_request
 def before_request():
-    """
-    This function is run at the beginning of every web request
-    (every time you enter an address in the web browser).
-    We use it to setup a database connection that can be used throughout the request
+  """
+  This function is run at the beginning of every web request
+  (every time you enter an address in the web browser).
+  We use it to setup a database connection that can be used throughout the request
 
-    The variable g is globally accessible
-    """
-    try:
-      g.conn = engine.connect()
-    except:
-      print "uh oh, problem connecting to database"
-      import traceback; traceback.print_exc()
-      g.conn = None
+  The variable g is globally accessible
+  """
+  try:
+    g.conn = engine.connect()
+  except:
+    print "uh oh, problem connecting to database"
+    import traceback; traceback.print_exc()
+    g.conn = None
 
 @app.teardown_request
 def teardown_request(exception):
-    """
-    At the end of the web request, this makes sure to close the database connection.
-    If you don't the database could run out of memory!
-    """
-    try:
-      g.conn.close()
-    except Exception as e:
-      pass
+  """
+  At the end of the web request, this makes sure to close the database connection.
+  If you don't the database could run out of memory!
+  """
+  try:
+    g.conn.close()
+  except Exception as e:
+    pass
 
 
 #
@@ -115,16 +115,14 @@ def index():
     #
     # example of a database query
     #
-    cursor = g.conn.execute("SELECT table_name FROM information_schema.tables WHERE table_schema='public' AND table_type='BASE TABLE';")
-    # print cursor
-    names_ = []
-    for result in cursor:
-        # print result
-        names_.append(result[0])
-    # names = [i for i in engine.table_names() if '_' not in i]
-    names = [i for i in names_ if '_' not in i]
+    # cursor = g.conn.execute("SELECT name FROM test")
+    # names = []
+    # for result in cursor:
+    #   names.append(result['name'])  # can also be accessed using result[0]
     # print names
-    cursor.close()
+    names = [i for i in engine.table_names() if '_' not in i]
+    print names
+    # cursor.close()
 
     #
     # Flask uses Jinja templates, which is an extension to HTML where you can
@@ -153,6 +151,7 @@ def index():
     #     {% endfor %}
     #
     context = dict(data=names)
+
 
     #
     # render_template looks in the templates/ folder for files.
@@ -189,78 +188,43 @@ class List_Search(MethodView):
     # def dispatch_request(self, name):
     #     return 'Hello %s!' % name
 
-    def get(self, name, search):
-        if request.method != 'POST':
-            field_query = "SELECT column_name FROM information_schema.columns WHERE table_name = \'" + str(name) + "\'"
-            cursor = g.conn.execute(field_query)
-            fields = []
-            for field in cursor:
-                fields.append(field)
-            # print fields
-            cursor.close()
-            query = "SELECT * FROM " + str(name)
-            cursor = g.conn.execute(query)
-            table = []
-            for cells in cursor:
-                table.append(cells)
-            # print table
-            cursor.close()
-            context = dict(t_name=str(name), table=table, fields=fields)
-            return render_template("table.html", **context)
-
-            # # print name
-            # query = "SELECT * FROM " + str(name)
-            # # print query
-            # cursor = g.conn.execute(query)
-            # # print cursor
-            # output = []
-            # for result in cursor:
-            #     output.append(result)
-            # # print output
-            # cursor.close()
-            # context = dict(t_name=str(name), table=output)
-            # return render_template("table.html", **context)
+    def get(self, name):
+        # print name
+        query = "SELECT * FROM " + str(name)
+        # print query
+        cursor = g.conn.execute(query)
+        # print cursor
+        output = []
+        for result in cursor:
+            output.append(result)
+        # print output
+        cursor.close()
+        context = dict(t_name=str(name), table=output)
+        return render_template("table.html", **context)
 
     def post(self, name):
-        # print name
+        print name
         search = request.form['search']
-        # print search
+        print search
         if name == 'artist' or name == 'album':
-            # Need %% to escape %
-            query = "SELECT * FROM artist a, album al, contributes_to c WHERE a.a_id = c.a_id AND al.al_id = c.al_id AND a.a_name LIKE \'" + str(search) + "%%\';"
-            # query = "SELECT * FROM artist a, album al, contributes_to c WHERE a.a_id = c.a_id AND al.al_id = c.al_id AND a.a_name = VALUES(%s);"
-            print query
-            print str(search)
-            # cursor = g.conn.execute(query, (search, ))
-            cursor = g.conn.execute(query)
+            g.conn.execute('Select * FROM Artists A, Albums Al, contributes_to C WHERE A.a_id = C.a_id AND Al.al_id = C.al_id AND A.a_name = ', str(search))
         elif name == 'song':
-            query = "SELECT * FROM artist a, song s, contributes_to c WHERE a.a_id = c.a_id AND s.s_id = c.s_id AND s.s_name LIKE \'" + str(search) + "%%\';"
-            print query
-            cursor = g.conn.execute(query)
+            g.conn.execute('Select * FROM Artists A, Song S, contributes_to C WHERE A.a_id = C.a_id AND S.s_id = C.s_id AND A.a_name = VALUES(NULL, ?);', str(search))
         elif name == 'genre':
-            query = "SELECT * FROM song s, genre g, belongs_to b WHERE s.s_id = b.s_id AND b.g_id = g.g_id AND g.g_name LIKE \'" + str(search) + "%%\';"
-            print query
-            cursor = g.conn.execute(query)
+            g.conn.execute('Select * FROM Song S, Genre g, belongs_to B WHERE S.s_id = B.s_id AND B.g_id = S.g_id AND S.s_name = VALUES(NULL, ?);', str(search))
         elif name == 'label':
-            query = "SELECT * FROM artist a, label l, has_signed h WHERE a.a_id = h.a_id AND l.l_id = h.l_id AND l.l_name LIKE \'" + str(search) + "%%\';"
-            print query
-            cursor = g.conn.execute(query)
+            g.conn.execute('Select * FROM Artist A, Label L, has_signed H WHERE A.a_id = H.a_id AND L.l_id = H.l_id AND A.a_name = VALUES(NULL, ?);', str(search))
         elif name == 'playlist':
-            query = "SELECT * FROM playlist p, contains_ c, song s WHERE p.p_id = c.p_id AND c.s_id = s.s_id AND p.p_name LIKE \'" + str(search) + "%%\';"
-            print query
-            cursor = g.conn.execute(query)
-        else:
-            query = "SELECT * FROM artist a, performs_at p, concert c WHERE p.a_id = a.a_id AND p.c_id = c.c_id AND c.c_name LIKE \'" + str(search) + "%%\';"
-            print query
-            cursor = g.conn.execute(query)
-        print cursor
+            g.conn.execute('SELECT * FROM playlist p, contains_ c, song s WHERE p.p_id = c.p_id AND c.s_id = s.s_id AND p.p_name = VALUES (NULL, ?);', str(search))
+        elif name == 'concert':
+            g.conn.execute('SELECT * FROM artist a, performs_at p, concert c WHERE p.a_id = a.a_id AND p.c_id = c.c_id AND c.c_name = VALUES (NULL, ?);', str(search))
         output = []
         for result in cursor:
             output.append(result)
         print output
         cursor.close()
         context = dict(search=str(search), t_name=str(name), table=output)
-        return render_template("search_2.html", **context)
+        return render_template("search.html", **context)
 
     # def add():
     #     user_input = request.form['input']
@@ -268,17 +232,17 @@ class List_Search(MethodView):
     #     return redirect('/')
 
 ListSearch_View = List_Search.as_view('List_Table')
-app.add_url_rule('/<name>', defaults={'search': None}, view_func=ListSearch_View, methods=['GET', 'POST'])
-app.add_url_rule('/<name>/search', view_func=ListSearch_View, methods=['POST'])
+app.add_url_rule('/<name>', view_func=ListSearch_View)
+app.add_url_rule('/search', view_func=ListSearch_View)
 
 
-# # Example of adding new data to the database
-# @app.route('/add', methods=['POST'])
-# def add():
-#   name = request.form['name']
-#   print name
-#   g.conn.execute('INSERT INTO test VALUES (NULL, ?)', name)
-#   return redirect('/')
+
+# Example of adding new data to the database
+@app.route('/add', methods=['POST'])
+def add():
+  name = request.form['name']
+  g.conn.execute('INSERT INTO test VALUES (NULL, ?)', name)
+  return redirect('/')
 
 
 @app.route('/login')
@@ -288,29 +252,29 @@ def login():
 
 
 if __name__ == "__main__":
-    import click
+  import click
 
-    @click.command()
-    @click.option('--debug', is_flag=True)
-    @click.option('--threaded', is_flag=True)
-    @click.argument('HOST', default='0.0.0.0')
-    @click.argument('PORT', default=8111, type=int)
-    def run(debug, threaded, host, port):
-      """
-      This function handles command line parameters.
-      Run the server using
+  @click.command()
+  @click.option('--debug', is_flag=True)
+  @click.option('--threaded', is_flag=True)
+  @click.argument('HOST', default='0.0.0.0')
+  @click.argument('PORT', default=8111, type=int)
+  def run(debug, threaded, host, port):
+    """
+    This function handles command line parameters.
+    Run the server using
 
-          python server.py
+        python server.py
 
-      Show the help text using
+    Show the help text using
 
-          python server.py --help
+        python server.py --help
 
-      """
+    """
 
-      HOST, PORT = host, port
-      print "running on %s:%d" % (HOST, PORT)
-      app.run(host=HOST, port=PORT, debug=debug, threaded=threaded)
+    HOST, PORT = host, port
+    print "running on %s:%d" % (HOST, PORT)
+    app.run(host=HOST, port=PORT, debug=debug, threaded=threaded)
 
 
-    run()
+  run()
