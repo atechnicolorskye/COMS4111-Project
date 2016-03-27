@@ -17,8 +17,10 @@ Read about it online.
 
 from flask import Flask, request, render_template, g, redirect, Response
 from flask.views import MethodView
+from operator import itemgetter
 import os
 import psycopg2
+from psycopg2.extensions import AsIs
 from sqlalchemy import *
 from sqlalchemy.pool import NullPool
 from sqlalchemy_utils import database_exists, create_database
@@ -123,7 +125,7 @@ def index():
         names_.append(result[0])
     # names = [i for i in engine.table_names() if '_' not in i]
     names = [i for i in names_ if '_' not in i]
-    # print names
+    names = sorted(names)
     cursor.close()
 
     #
@@ -191,73 +193,65 @@ class List_Search(MethodView):
 
     def get(self, name, search):
         if request.method != 'POST':
-            field_query = "SELECT column_name FROM information_schema.columns WHERE table_name = \'" + str(name) + "\'"
-            cursor = g.conn.execute(field_query)
+            # Get table fields
+            field_query = "SELECT column_name FROM information_schema.columns WHERE table_name = %s;"
+            cursor_field = g.conn.execute(field_query, (name,))
             fields = []
-            for field in cursor:
+            for field in cursor_field:
                 fields.append(field)
-            # print fields
-            cursor.close()
-            query = "SELECT * FROM " + str(name)
-            cursor = g.conn.execute(query)
+            cursor_field.close()
+            # http://stackoverflow.com/questions/13793399/passing-table-name-as-a-parameter-in-psycopg2
+            # Get table entries
+            query = "SELECT * FROM %(table)s;"
+            cursor = g.conn.execute(query, {"table": AsIs(name)})
             table = []
             for cells in cursor:
                 table.append(cells)
-            # print table
             cursor.close()
+            table = sorted(table)
             context = dict(t_name=str(name), table=table, fields=fields)
             return render_template("table.html", **context)
-
-            # # print name
-            # query = "SELECT * FROM " + str(name)
-            # # print query
-            # cursor = g.conn.execute(query)
-            # # print cursor
-            # output = []
-            # for result in cursor:
-            #     output.append(result)
-            # # print output
-            # cursor.close()
-            # context = dict(t_name=str(name), table=output)
-            # return render_template("table.html", **context)
 
     def post(self, name):
         # print name
         search = request.form['search']
+        search_ph = search + '%%'
         # print search
-        if name == 'artist' or name == 'album':
+        if name == 'album':
             # Need %% to escape %
-            query = "SELECT * FROM artist a, album al, contributes_to c WHERE a.a_id = c.a_id AND al.al_id = c.al_id AND a.a_name LIKE \'" + str(search) + "%%\';"
+            query = "SELECT * FROM artist a, album al, contributes_to c WHERE a.a_id = c.a_id AND al.al_id = c.al_id AND al.al_name LIKE %s;"
             # query = "SELECT * FROM artist a, album al, contributes_to c WHERE a.a_id = c.a_id AND al.al_id = c.al_id AND a.a_name = VALUES(%s);"
             print query
-            print str(search)
-            # cursor = g.conn.execute(query, (search, ))
-            cursor = g.conn.execute(query)
+            cursor = g.conn.execute(query, (search_ph,))
+        elif name == 'artist':
+            query = "SELECT * FROM artist a, album al, contributes_to c WHERE a.a_id = c.a_id AND al.al_id = c.al_id AND a.a_name LIKE %s;"
+            print query
+            cursor = g.conn.execute(query, (search_ph,))
         elif name == 'song':
-            query = "SELECT * FROM artist a, song s, contributes_to c WHERE a.a_id = c.a_id AND s.s_id = c.s_id AND s.s_name LIKE \'" + str(search) + "%%\';"
+            query = "SELECT * FROM artist a, song s, contributes_to c WHERE a.a_id = c.a_id AND s.s_id = c.s_id AND s.s_name LIKE %s;"
             print query
-            cursor = g.conn.execute(query)
+            cursor = g.conn.execute(query, (search_ph,))
         elif name == 'genre':
-            query = "SELECT * FROM song s, genre g, belongs_to b WHERE s.s_id = b.s_id AND b.g_id = g.g_id AND g.g_name LIKE \'" + str(search) + "%%\';"
+            query = "SELECT * FROM song s, genre g, belongs_to b WHERE s.s_id = b.s_id AND b.g_id = g.g_id AND g.g_name LIKE %s;"
             print query
-            cursor = g.conn.execute(query)
+            cursor = g.conn.execute(query, (search_ph,))
         elif name == 'label':
-            query = "SELECT * FROM artist a, label l, has_signed h WHERE a.a_id = h.a_id AND l.l_id = h.l_id AND l.l_name LIKE \'" + str(search) + "%%\';"
+            query = "SELECT * FROM artist a, label l, has_signed h WHERE a.a_id = h.a_id AND l.l_id = h.l_id AND l.l_name LIKE %s;"
             print query
-            cursor = g.conn.execute(query)
+            cursor = g.conn.execute(query, (search_ph,))
         elif name == 'playlist':
-            query = "SELECT * FROM playlist p, contains_ c, song s WHERE p.p_id = c.p_id AND c.s_id = s.s_id AND p.p_name LIKE \'" + str(search) + "%%\';"
+            query = "SELECT * FROM playlist p, contains_ c, song s WHERE p.p_id = c.p_id AND c.s_id = s.s_id AND p.p_name LIKE %s;"
             print query
-            cursor = g.conn.execute(query)
+            cursor = g.conn.execute(query, (search_ph,))
         else:
-            query = "SELECT * FROM artist a, performs_at p, concert c WHERE p.a_id = a.a_id AND p.c_id = c.c_id AND c.c_name LIKE \'" + str(search) + "%%\';"
+            query = "SELECT * FROM artist a, performs_at p, concert c WHERE p.a_id = a.a_id AND p.c_id = c.c_id AND c.c_name LIKE %s;"
             print query
-            cursor = g.conn.execute(query)
-        print cursor
+            cursor = g.conn.execute(query, (search_ph,))
+        # print cursor
         output = []
         for result in cursor:
             output.append(result)
-        print output
+        output = sorted(output)
         cursor.close()
         context = dict(search=str(search), t_name=str(name), table=output)
         return render_template("search.html", **context)

@@ -1,0 +1,11 @@
+{% extends "layout.html" %}
+{% block content %}
+<table>
+{% for t in table %}
+<TR>
+{% for x in t %}
+   <TD class="c1">{{x}}</TD>
+{% endfor %}
+</TR>  
+  {% endfor %}
+{% endblock %}
