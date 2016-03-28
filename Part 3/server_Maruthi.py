@@ -17,7 +17,6 @@ Read about it online.
 
 from flask import Flask, request, render_template, g, redirect, Response
 from flask.views import MethodView
-from operator import itemgetter
 import os
 import psycopg2
 from psycopg2.extensions import AsIs
