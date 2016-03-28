@@ -28,7 +28,6 @@ from sqlalchemy_utils import database_exists, create_database
 tmpl_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'templates')
 app = Flask(__name__, template_folder=tmpl_dir)
 
-
 #
 # The following uses the sqlite3 database test.db -- you can use this for debugging purposes
 # However for the project you will need to connect to your Part 2 database in order to use the
@@ -44,10 +43,6 @@ app = Flask(__name__, template_folder=tmpl_dir)
 #
 DATABASEURI = "postgresql://localhost:5432/Production"
 
-
-#
-# This line creates a database engine that knows how to connect to the URI above
-#
 engine = create_engine(DATABASEURI, isolation_level="AUTOCOMMIT")
 if not database_exists(engine.url):
     create_database(engine.url)
@@ -55,8 +50,6 @@ if not database_exists(engine.url):
     engine.execute(open("Insert_Maruthi.sql", "r").read())
     engine.execute(open("Insert_Sky.sql", "r").read())
     print True
-
-
 
 @app.before_request
 def before_request():
@@ -85,20 +78,6 @@ def teardown_request(exception):
     except Exception as e:
       pass
 
-
-#
-# @app.route is a decorator around index() that means:
-#   run index() whenever the user tries to access the "/" path using a GET request
-#
-# If you wanted the user to go to e.g., localhost:8111/foobar/ with POST or GET then you could use
-#
-#       @app.route("/foobar/", methods=["POST", "GET"])
-#
-# PROTIP: (the trailing / in the path is important)
-#
-# see for routing: http://flask.pocoo.org/docs/0.10/quickstart/#routing
-# see for decorators: http://simeonfranklin.com/blog/2012/jul/1/python-decorators-in-12-steps/
-#
 @app.route('/')
 def index():
     """
@@ -112,11 +91,8 @@ def index():
     """
 
     # DEBUG: this is debugging code to see what request looks like
-    print request.args
+    # print request.args
 
-    #
-    # example of a database query
-    #
     cursor = g.conn.execute("SELECT table_name FROM information_schema.tables WHERE table_schema='public' AND table_type='BASE TABLE';")
     # print cursor
     names_ = []
@@ -127,63 +103,10 @@ def index():
     names = [i for i in names_ if '_' not in i]
     names = sorted(names)
     cursor.close()
-
-    #
-    # Flask uses Jinja templates, which is an extension to HTML where you can
-    # pass data to a template and dynamically generate HTML based on the data
-    # (you can think of it as simple PHP)
-    # documentation: https://realpython.com/blog/python/primer-on-jinja-templating/
-    #
-    # You can see an example template in templates/index.html
-    #
-    # context are the variables that are passed to the template.
-    # for example, "data" key in the context variable defined below will be
-    # accessible as a variable in index.html:
-    #
-    #     # will print: [u'grace hopper', u'alan turing', u'ada lovelace']
-    #     <div>{{data}}</div>
-    #
-    #     # creates a <div> tag for each element in data
-    #     # will print:
-    #     #
-    #     #   <div>grace hopper</div>
-    #     #   <div>alan turing</div>
-    #     #   <div>ada lovelace</div>
-    #     #
-    #     {% for n in data %}
-    #     <div>{{n}}</div>
-    #     {% endfor %}
-    #
-    context = dict(data=names)
-
-    #
-    # render_template looks in the templates/ folder for files.
-    # for example, the below file reads template/index.html
-    #
+    context = dict(names=names)
     return render_template("index.html", **context)
 
-#
-# This is an example of a different path.  You can see it at
-#
-#     localhost:8111/another
-#
-# notice that the functio name is another() rather than index()
-# the functions for each app.route needs to have different names
-#
-
-# @app.route('/concert')
-# def another():
-#     query = "SELECT * FROM concert;"
-#     cursor = g.conn.execute(query)
-#     output = []
-#     for result in cursor:
-#         output.append(result)
-#     cursor.close()
-#     context = dict(n='Concert', table=output)
-#     return render_template("table.html", **context)
-
-
-# Creates class to render all hyperlinks
+# Creates class to render all hyperlinks, show lists, and search table
 class List_Search(MethodView):
 
     # methods = ['GET', 'POST']
@@ -191,8 +114,9 @@ class List_Search(MethodView):
     # def dispatch_request(self, name):
     #     return 'Hello %s!' % name
 
-    def get(self, name, search):
+    def get(self, name):
         if request.method != 'POST':
+            '''
             # Get table fields
             field_query = "SELECT column_name FROM information_schema.columns WHERE table_name = %s;"
             cursor_field = g.conn.execute(field_query, (name,))
@@ -200,6 +124,7 @@ class List_Search(MethodView):
             for field in cursor_field:
                 fields.append(field)
             cursor_field.close()
+            '''
             # http://stackoverflow.com/questions/13793399/passing-table-name-as-a-parameter-in-psycopg2
             # Get table entries
             query = "SELECT * FROM %(table)s;"
@@ -207,72 +132,80 @@ class List_Search(MethodView):
             table = []
             for cells in cursor:
                 table.append(cells)
+            # Get table fields, http://docs.sqlalchemy.org/en/latest/core/connections.html#sqlalchemy.engine.ResultProxy
+            fields = cursor.keys()
+            # Format fields correctly
+            fields = [(f,) for f in fields]
             cursor.close()
             table = sorted(table)
-            context = dict(t_name=str(name), table=table, fields=fields)
+            context = dict(t_name=str(name).title(), table=table, fields=fields)
             return render_template("table.html", **context)
 
     def post(self, name):
         # print name
         search = request.form['search']
         search_ph = search + '%%'
+        name = name.lower()
         # print search
         if name == 'album':
             # Need %% to escape %
-            query = "SELECT * FROM artist a, album al, contributes_to c WHERE a.a_id = c.a_id AND al.al_id = c.al_id AND al.al_name LIKE %s;"
+            query = "SELECT * FROM artist a, album al, (select a_id, al_id from contributes_to) c WHERE a.a_id = c.a_id AND al.al_id = c.al_id AND al.al_name LIKE %s;"
             # query = "SELECT * FROM artist a, album al, contributes_to c WHERE a.a_id = c.a_id AND al.al_id = c.al_id AND a.a_name = VALUES(%s);"
-            print query
+            # print query
             cursor = g.conn.execute(query, (search_ph,))
         elif name == 'artist':
-            query = "SELECT * FROM artist a, album al, contributes_to c WHERE a.a_id = c.a_id AND al.al_id = c.al_id AND a.a_name LIKE %s;"
-            print query
+            query = "SELECT * FROM artist a, album al, (select a_id, al_id from contributes_to) c WHERE a.a_id = c.a_id AND al.al_id = c.al_id AND a.a_name LIKE %s;"
+            # print query
             cursor = g.conn.execute(query, (search_ph,))
         elif name == 'song':
-            query = "SELECT * FROM artist a, song s, contributes_to c WHERE a.a_id = c.a_id AND s.s_id = c.s_id AND s.s_name LIKE %s;"
-            print query
+            query = "SELECT * FROM artist a, song s, (select a_id, s_id from contributes_to) c WHERE a.a_id = c.a_id AND s.s_id = c.s_id AND s.s_name LIKE %s;"
+            # print query
             cursor = g.conn.execute(query, (search_ph,))
         elif name == 'genre':
             query = "SELECT * FROM song s, genre g, belongs_to b WHERE s.s_id = b.s_id AND b.g_id = g.g_id AND g.g_name LIKE %s;"
-            print query
+            # print query
             cursor = g.conn.execute(query, (search_ph,))
         elif name == 'label':
             query = "SELECT * FROM artist a, label l, has_signed h WHERE a.a_id = h.a_id AND l.l_id = h.l_id AND l.l_name LIKE %s;"
-            print query
+            # print query
             cursor = g.conn.execute(query, (search_ph,))
         elif name == 'playlist':
             query = "SELECT * FROM playlist p, contains_ c, song s WHERE p.p_id = c.p_id AND c.s_id = s.s_id AND p.p_name LIKE %s;"
-            print query
+            # print query
             cursor = g.conn.execute(query, (search_ph,))
         else:
             query = "SELECT * FROM artist a, performs_at p, concert c WHERE p.a_id = a.a_id AND p.c_id = c.c_id AND c.c_name LIKE %s;"
-            print query
+            # print query
             cursor = g.conn.execute(query, (search_ph,))
-        # print cursor
+        # Get fields
+        _fields = cursor.keys()
+        # print _fields
+        # Get unique set of fields
+        # fields = sorted(list(set(_fields))) not used as order is not maintained
+        fields = []
+        for x in _fields:
+            if x not in fields:
+                fields.append(x)
+        # print fields
         output = []
         for result in cursor:
-            output.append(result)
+            row = ()
+            for f in fields:
+                # print result[f]
+                row += (result[f],)
+            output.append(row)
         output = sorted(output)
+        # Format fields correctly, but only after to prevent type issues
+        fields = [(f,) for f in fields]
         cursor.close()
-        context = dict(search=str(search), t_name=str(name), table=output)
+        context = dict(search=str(search), t_name=str(name).title(), table=output, fields=fields)
         return render_template("search.html", **context)
 
-    # def add():
-    #     user_input = request.form['input']
-    #     g.conn.execute('INSERT INTO '+ name + ' VALUES (NULL, ?)', user_input)
-    #     return redirect('/')
 
 ListSearch_View = List_Search.as_view('List_Table')
-app.add_url_rule('/<name>', defaults={'search': None}, view_func=ListSearch_View, methods=['GET', 'POST'])
-app.add_url_rule('/<name>/search', view_func=ListSearch_View, methods=['POST'])
-
-
-# # Example of adding new data to the database
-# @app.route('/add', methods=['POST'])
-# def add():
-#   name = request.form['name']
-#   print name
-#   g.conn.execute('INSERT INTO test VALUES (NULL, ?)', name)
-#   return redirect('/')
+# Can always use defaults={'search': None} as a arg if need be
+app.add_url_rule('/<name>', view_func=ListSearch_View)
+app.add_url_rule('/<name>/search', view_func=ListSearch_View)
 
 
 @app.route('/login')

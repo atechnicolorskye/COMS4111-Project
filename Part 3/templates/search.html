@@ -2,10 +2,29 @@
 {% block content %}
 
 <h2>The search for {{search}} in {{t_name}} yielded:</h2>
-<div>
-  {% for t in table %}
-  <div>- {{t}}</a></div>
+
+<style type="text/css">
+TD {
+    padding: 10px;
+}
+</style>
+
+<table>
+{% for f in fields %}
+<TD>
+{% for x in f %}
+   <b>{{x}}</b>
+{% endfor %}
+</TD>
   {% endfor %}
-</div>
+
+{% for t in table %}
+<TR>
+{% for x in t %}
+   <TD>{{x}}</TD>
+{% endfor %}
+</TR>
+  {% endfor %}
+</table>
 
 {% endblock %}

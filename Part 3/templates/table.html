@@ -1,20 +1,26 @@
 {% extends "layout.html" %}
 {% block content %}
 
+<style type="text/css">
+TD {
+    padding: 10px;
+}
+</style>
+
 <h2>{{t_name}}:</h2>
-<table>
+<table >
 {% for f in fields %}
-<TD>
+<TD cellpadding="10">
 {% for x in f %}
    <b>{{x}}</b>
 {% endfor %}
 </TD>
-  {% endfor %}
+{% endfor %}
 
 {% for t in table %}
 <TR>
 {% for x in t %}
-   <TD>{{x}}</TD>
+   <TD cellpadding="10">{{x}}</TD>
 {% endfor %}
 </TR>
   {% endfor %}
@@ -22,7 +28,10 @@
 <br>
 
 <form method="POST" action={{t_name ~ "/search"}}>
-<p>Search for {% if t_name == 'artist' or t_name == 'album' %} an {% else %} a {% endif %} {{t_name}}: <input type="text" name="search"> <input type="submit" value="Search"></p>
+
+<!-- Search for {% if t_name == 'artist' or t_name == 'album' %} an {% else %} a {% endif %}  -->
+
+<p>Search: <input type="text" name="search"> <input type="submit" value="Search"></p>
 </form>
 
 {% endblock %}

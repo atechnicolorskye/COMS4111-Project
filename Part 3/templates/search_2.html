@@ -1,18 +1,12 @@
 {% extends "layout.html" %}
 {% block content %}
 
-<h2>Search {{name}}:</h2>
-<table>
-{% for t in table %}
-<TR>
-{% for x in t %}
-   <TD class="c1">{{x}}</TD>
-{% endfor %}
-</TR>  
+<h2>The search for {{search}} in {{t_name}}:</h2>
+<div>
+  {% for t in output %}
+  <div>- {{t}}</a></div>
   {% endfor %}
+</div>
 
-<form method="GET" action="search">
-<p>Search for {% if t_name == 'artist' or t_name == 'album' %} an {% else %} a {% endif %} {{t_name}} <input type="text" name="search"> <input type="submit" value="Search"></p>
-</form>
-
+{% endfor %}
 {% endblock %}

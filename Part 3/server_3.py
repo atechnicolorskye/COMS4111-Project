@@ -224,14 +224,21 @@ class List_Search(MethodView):
     def post(self, name):
         # print name
         search = request.form['search']
+        output2=[]
         # print search
         if name == 'artist' or name == 'album':
-            # Need %% to escape %
-            query = "SELECT * FROM artist a, album al, contributes_to c WHERE a.a_id = c.a_id AND al.al_id = c.al_id AND a.a_name LIKE \'" + str(search) + "%%\';"
-            # query = "SELECT * FROM artist a, album al, contributes_to c WHERE a.a_id = c.a_id AND al.al_id = c.al_id AND a.a_name = VALUES(%s);"
+            query = "SELECT a.a_name, al.al_name FROM artist a, album al, contributes_to c WHERE a.a_id = c.a_id AND al.al_id = c.al_id AND a.a_name LIKE \'" + str(search) + "%%\';"
+            query2= "CREATE TABLE final34 AS"+query
+            print query2
+            g.conn.execute(query)
+            query3= "SELECT column_name FROM information_schema.columns WHERE table_name = 'final34'"
+            print query3
+            cursor=g.conn.execute(query3)
+            for result in cursor:
+            	output2.append(result[0])
+        	print output2
+        	cursor.close()
             print query
-            print str(search)
-            # cursor = g.conn.execute(query, (search, ))
             cursor = g.conn.execute(query)
         elif name == 'song':
             query = "SELECT * FROM artist a, song s, contributes_to c WHERE a.a_id = c.a_id AND s.s_id = c.s_id AND s.s_name LIKE \'" + str(search) + "%%\';"
@@ -259,8 +266,8 @@ class List_Search(MethodView):
             output.append(result)
         print output
         cursor.close()
-        context = dict(search=str(search), t_name=str(name), table=output)
-        return render_template("search_2.html", **context)
+        context = dict(search=str(search), t_name=str(name), table=output, table2=output2)
+        return render_template("search_3.html", **context)
 
     # def add():
     #     user_input = request.form['input']
