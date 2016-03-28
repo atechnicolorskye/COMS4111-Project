@@ -106,6 +106,7 @@ def index():
     context = dict(names=names)
     return render_template("index.html", **context)
 
+
 # Creates class to render all hyperlinks, show lists, and search table
 class List_Search(MethodView):
 
@@ -138,7 +139,7 @@ class List_Search(MethodView):
             fields = [(f,) for f in fields]
             cursor.close()
             table = sorted(table)
-            context = dict(t_name=str(name).title(), table=table, fields=fields)
+            context = dict(t_name=str(name), table=table, fields=fields)
             return render_template("table.html", **context)
 
     def post(self, name):

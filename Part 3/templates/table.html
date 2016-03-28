@@ -7,7 +7,7 @@ TD {
 }
 </style>
 
-<h2>{{t_name}}:</h2>
+<h2>{% filter title %}{{t_name}}{% endfilter %}:</h2>
 <table >
 {% for f in fields %}
 <TD cellpadding="10">
