@@ -43,7 +43,8 @@ app = Flask(__name__, template_folder=tmpl_dir)
 #
 #     DATABASEURI = "postgresql://ewu2493:foobar@w4111db.eastus.cloudapp.azure.com/ewu2493"
 #
-DATABASEURI = "postgresql://localhost:5432/Production"
+DATABASEURI = "postgresql://sl3950:HFTVTS@w4111db.eastus.cloudapp.azure.com/sl3950"
+# DATABASEURI = "postgresql://localhost:5432/Production"
 
 engine = create_engine(DATABASEURI, isolation_level="AUTOCOMMIT")
 if not database_exists(engine.url):
@@ -103,10 +104,10 @@ def index():
         names_.append(result[0])
     # names = [i for i in engine.table_names() if '_' not in i]
     entities = [i for i in names_ if '_' not in i]
-    relations = [i for i in names_ if '_' in i]
+    # relations = [i for i in names_ if '_' in i]
     entities = sorted(entities)
     cursor.close()
-    context = dict(entities=entities, relations=relations)
+    context = dict(entities=entities)
     return render_template("index.html", **context)
 
 
