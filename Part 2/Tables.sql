@@ -1,7 +1,7 @@
 CREATE TABLE Artist(
 a_id int8,
 a_name varchar(64) NOT NULL,
-a_year date CHECK (a_year>= DATE '1950-01-01' AND a_year< DATE '2010-05-01'),
+a_year date CHECK (a_year>= DATE '1950-01-01' AND a_year< DATE '2016-05-01'),
 a_country varchar(64) NOT NULL,
 PRIMARY KEY(a_id)
 );
@@ -9,7 +9,7 @@ PRIMARY KEY(a_id)
 CREATE TABLE Album(
 al_id int8,
 al_name varchar(64) NOT NULL,
-al_dur interval CHECK (al_dur between '0'::interval and '3:00:00'::interval),
+al_dur interval CHECK (al_dur between '00:00:01'::interval and '10 years'::interval),
 al_num_songs int8,
 CHECK(al_num_songs>=1),
 PRIMARY KEY(al_id)
@@ -19,7 +19,7 @@ CREATE TABLE Song(
 s_id int8,
 s_name varchar(64) NOT NULL,
 s_no int8 CHECK(s_no>=1),
-s_dur interval CHECK (s_dur between '0'::interval and '10:00'::interval)
+s_dur interval CHECK (s_dur between '00:00:01'::interval and '2:00:00'::interval),
 s_compose varchar(64),
 PRIMARY KEY(s_id)
 );
@@ -41,7 +41,7 @@ p_id int8 CHECK(p_id >=1),
 p_name varchar(64) NOT NULL,
 p_time timestamptz,
 p_num_songs int8 CHECK (p_num_songs >=1),
-p_dur interval CHECK(p_time between '0'::interval and '3:00:00'::interval),
+p_dur interval,
 p_user varchar(64) NOT NULL,
 PRIMARY KEY(p_id)
 );

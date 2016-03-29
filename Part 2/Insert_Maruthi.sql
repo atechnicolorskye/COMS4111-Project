@@ -10,11 +10,11 @@ INSERT INTO Album VALUES(08, 'Hits', '45:06', 6);
 INSERT INTO Album VALUES(09, 'Hits', '1:49:06', 7);
 INSERT INTO Album VALUES(10, 'Hits', '1:45:00', 10);
 
-INSERT INTO Song VALUES(06, 'singer', 3, '5:06', 'Bananas');
-INSERT INTO Song VALUES(07, 'hello', 5, '2:45', 'Jackson');
-INSERT INTO Song VALUES(08, 'uptown', 6, '4:56', 'Rahman');
-INSERT INTO Song VALUES(09, 'funk', 2, '7:23', 'Apples');
-INSERT INTO Song VALUES(10, 'purple hills', 4, '5:06', 'Eminem');
+INSERT INTO Song VALUES(06, 'singer', 3, '0:05:06', 'Bananas');
+INSERT INTO Song VALUES(07, 'hello', 5, '0:02:45', 'Jackson');
+INSERT INTO Song VALUES(08, 'uptown', 6, '0:04:56', 'Rahman');
+INSERT INTO Song VALUES(09, 'funk', 2, '0:07:23', 'Apples');
+INSERT INTO Song VALUES(10, 'purple hills', 4, '0:05:06', 'Eminem');
 
 INSERT INTO Genre VALUES(06,'Punk rock');
 INSERT INTO Genre VALUES(07,'Alternate rock');

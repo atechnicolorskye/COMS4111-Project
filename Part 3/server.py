@@ -27,6 +27,9 @@ from sqlalchemy_utils import database_exists, create_database
 tmpl_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'templates')
 app = Flask(__name__, template_folder=tmpl_dir)
 
+# DROP TABLE album, artist, belongs_to, concert, contains_, contributes_to, genre, has_signed, label, performs_at, playlist, release_, song CASCADE;
+
+
 #
 # The following uses the sqlite3 database test.db -- you can use this for debugging purposes
 # However for the project you will need to connect to your Part 2 database in order to use the
