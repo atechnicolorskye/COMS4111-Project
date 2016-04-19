@@ -1,7 +1,7 @@
 CREATE TABLE Artist(
 a_id int8,
 a_name varchar(64) NOT NULL,
-a_year date CHECK (a_year>= DATE '1950-01-01' AND a_year< DATE '2016-05-01'),
+a_year jsonb,
 a_country varchar(64) NOT NULL,
 PRIMARY KEY(a_id)
 );
@@ -9,8 +9,9 @@ PRIMARY KEY(a_id)
 CREATE TABLE Album(
 al_id int8,
 al_name varchar(64) NOT NULL,
-al_dur interval CHECK (al_dur between '00:00:01'::interval and '10 years'::interval),
-al_num_songs int8 CHECK(al_num_songs>=1),
+al_dur jsonb,
+al_num_songs int8,
+CHECK(al_num_songs>=1),
 PRIMARY KEY(al_id)
 );
 
@@ -18,7 +19,7 @@ CREATE TABLE Song(
 s_id int8,
 s_name varchar(64) NOT NULL,
 s_no int8 CHECK(s_no>=1),
-s_dur interval CHECK (s_dur between '00:00:01'::interval and '2:00:00'::interval),
+s_dur jsonb,
 s_compose varchar(64),
 PRIMARY KEY(s_id)
 );
@@ -82,7 +83,7 @@ FOREIGN KEY(g_id) REFERENCES Genre,
 FOREIGN KEY(s_id) REFERENCES Song
 );
 
-CREATE TABLE release(
+CREATE TABLE release_(
 al_id int8,
 l_id int8,
 r_year date CHECK(r_year>= DATE '1950-01-01' AND r_year< DATE '2016-05-01'),
@@ -98,7 +99,7 @@ PRIMARY KEY(a_id),
 FOREIGN KEY(l_id) REFERENCES Label
 );
 
-CREATE TABLE contains(
+CREATE TABLE contains_(
 p_id int8,
 s_id int8,
 PRIMARY KEY(p_id, s_id),
